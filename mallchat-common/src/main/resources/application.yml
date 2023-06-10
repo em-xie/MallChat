@@ -16,9 +16,9 @@ spring:
   application:
     name: mallchat
   datasource:
-    url: jdbc:mysql://${mallchat.mysql.ip}:${mallchat.mysql.port}/${mallchat.mysql.db}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: ${mallchat.mysql.username}
-    password: ${mallchat.mysql.password}
+    url: jdbc:mysql://127.0.0.1:3306/mallchat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       minimum-idle: 3
@@ -30,15 +30,15 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
   redis:
     # Redis服务器地址
-    host: ${mallchat.redis.host}
+    host: 127.0.0.1
     # Redis服务器端口号
-    port: ${mallchat.redis.port}
+    port: 6379
     # 使用的数据库索引，默认是0
     database: 0
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-    password: ${mallchat.redis.password}
+    password: 123456
     lettuce:
       pool:
         # 最大阻塞等待时间，负数表示没有限制
@@ -53,13 +53,13 @@ spring:
     serialization:
       write-dates-as-timestamps: true
 jwt:
-  secret: ${mallchat.jwt.secret}
+  secret: dsfsdfsdfsdfsd
 wx:
   mp:
-    #    callback: http://f4cd-113-92-129-127.ngrok.io
-    callback: ${mallchat.wx.callback}
+    callback: http://127.0.0.1:8080
+#    callback: ${mallchat.wx.callback}
     configs:
-      - appId: ${mallchat.wx.appId} # 第一个公众号的appid
-        secret: ${mallchat.wx.secret} # 公众号的appsecret
+      - appId: wx2c0e35054996b552 # 第一个公众号的appid
+        secret: 993de668fe9e1c9c0e2bb2564867e740 # 公众号的appsecret
         token: ${mallchat.wx.token} # 接口配置里的Token值
         aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
