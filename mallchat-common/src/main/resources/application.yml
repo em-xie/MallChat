@@ -59,7 +59,7 @@ wx:
     callback: http://127.0.0.1:8080
 #    callback: ${mallchat.wx.callback}
     configs:
-      - appId: wx2c0e35054996b552 # 第一个公众号的appid
+      - appId:  # 第一个公众号的appid
         secret: 993de668fe9e1c9c0e2bb2564867e740 # 公众号的appsecret
         token: ${mallchat.wx.token} # 接口配置里的Token值
         aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
