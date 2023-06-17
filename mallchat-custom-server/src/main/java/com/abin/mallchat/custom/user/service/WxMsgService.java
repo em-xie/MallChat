@@ -115,4 +115,12 @@ public class WxMsgService {
         //推送前端登录成功
         webSocketService.scanLoginSuccess(eventKey, user, token);
     }
+
+//    public void loginTest(Long uid, Integer eventKey) {
+//        User user = userDao.getById(uid);
+//        //调用用户登录模块
+//        String token = loginService.login(uid);
+//        //推送前端登录成功
+//        webSocketService.scanLoginSuccessTest(eventKey, user, token);
+//    }
 }

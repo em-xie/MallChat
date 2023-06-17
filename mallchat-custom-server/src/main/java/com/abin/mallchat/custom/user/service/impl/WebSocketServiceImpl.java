@@ -212,6 +212,24 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
+    public Boolean scanLoginSuccessTest(Channel channel, User user, String token) {
+
+        Integer code = generateLoginCode(channel);
+        //发送消息
+        channel = WAIT_LOGIN_MAP.get(code);
+        if (Objects.isNull(channel)) {
+            return Boolean.FALSE;
+        }
+        //移除code
+        WAIT_LOGIN_MAP.remove(code);
+        //用户登录
+        loginSuccess(channel, user, token);
+        return true;
+    }
+
+
+
+    @Override
     public Boolean scanSuccess(Integer loginCode) {
         Channel channel = WAIT_LOGIN_MAP.get(loginCode);
         if (Objects.isNull(channel)) {
@@ -249,6 +267,15 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public void sendToAllOnline(WSBaseResp<?> wsBaseResp) {
         sendToAllOnline(wsBaseResp, null);
+    }
+
+    @Override
+    public void login_jump(Channel channel) {
+        User user = userDao.getById(1);
+        String token = loginService.login(1L);
+        //推送前端登录成功
+        scanLoginSuccessTest(channel, user, token);
+
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {

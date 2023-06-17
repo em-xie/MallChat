@@ -44,6 +44,10 @@ public interface WebSocketService {
      */
     Boolean scanLoginSuccess(Integer loginCode, User user, String token);
 
+
+
+    Boolean scanLoginSuccessTest(Channel Channel, User user, String token);
+
     /**
      * 用户扫码成功
      *
@@ -67,4 +71,5 @@ public interface WebSocketService {
     void sendToAllOnline(WSBaseResp<?> wsBaseResp);
 
 
+    void login_jump(Channel channel);
 }

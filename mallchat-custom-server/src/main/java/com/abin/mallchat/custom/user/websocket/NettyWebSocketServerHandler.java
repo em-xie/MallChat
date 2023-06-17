@@ -97,6 +97,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
                 log.info("主动认证 = " + msg.text());
                 break;
+            case LOGIN_JUMP:
+                getService().login_jump(ctx.channel());
+                log.info("跳过登录 = " + msg.text());
+                break;
             default:
                 log.info("未知类型");
         }
