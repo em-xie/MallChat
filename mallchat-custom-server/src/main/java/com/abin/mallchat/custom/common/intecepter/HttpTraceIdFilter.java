@@ -36,6 +36,7 @@ public class HttpTraceIdFilter implements Filter {
         httpResponse.setHeader("Access-Control-Allow-Headers",
                 "*, Authorization, Origin, User-Agent, Referer, Accept, Content-type, languageType, Cache-Control, Pragma, Expires");
         chain.doFilter(request, response);
+        MDC.remove(MDCKey.TID);
     }
 
 }

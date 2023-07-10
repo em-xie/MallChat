@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.chat.service.strategy.msg;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
@@ -10,7 +11,8 @@ import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
-import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
+import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlDiscover;
+import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
@@ -20,7 +22,6 @@ import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.msg.TextMsgReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.msg.TextMsgResp;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +48,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     @Autowired
     private IRoleService iRoleService;
     
-    private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
+    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
     MessageTypeEnum getMsgTypeEnum() {
@@ -57,16 +58,14 @@ public class TextMsgHandler extends AbstractMsgHandler {
     @Override
     public void checkMsg(ChatMessageReq request, Long uid) {
         TextMsgReq body = BeanUtil.toBean(request.getBody(), TextMsgReq.class);
-        AssertUtil.isNotEmpty(body.getContent(), "内容不能为空");
-        AssertUtil.isTrue(body.getContent().length() < 500, "消息内容过长，服务器扛不住啊，兄dei");
+        AssertUtil.allCheckValidateThrow(body);
         //校验下回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
             Message replyMsg = messageDao.getById(body.getReplyMsgId());
             AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
         }
-        if (CollectionUtils.isNotEmpty(body.getAtUidList())) {
-            AssertUtil.isTrue(body.getAtUidList().size() > 10, "一次别艾特这么多人");
+        if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             List<Long> atUidList = body.getAtUidList();
             Map<Long, User> batch = userInfoCache.getBatch(atUidList);
             AssertUtil.equal(atUidList.size(), batch.values().size(), "@用户不存在");
@@ -93,10 +92,10 @@ public class TextMsgHandler extends AbstractMsgHandler {
 
         }
         //判断消息url跳转
-        Map<String, String> urlTitleMap = URL_TITLE_DISCOVER.getContentTitleMap(body.getContent());
-        extra.setUrlTitleMap(urlTitleMap);
+        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(body.getContent());
+        extra.setUrlContentMap(urlContentMap);
         //艾特功能
-        if (CollectionUtils.isNotEmpty(body.getAtUidList())) {
+        if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             extra.setAtUidList(body.getAtUidList());
 
         }
@@ -108,7 +107,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     public Object showMsg(Message msg) {
         TextMsgResp resp = new TextMsgResp();
         resp.setContent(msg.getContent());
-        resp.setUrlTitleMap(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
+        resp.setUrlContentMap(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getUrlContentMap).orElse(null));
         resp.setAtUidList(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
         //回复消息
         Optional<Message> reply = Optional.ofNullable(msg.getReplyMsgId())

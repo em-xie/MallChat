@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
         e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
         String message = errorMsg.toString();
         log.info("validation parameters error！The reason is:{}", message);
-        return ApiResult.fail(-1, message.substring(0, message.length() - 1));
+        return ApiResult.fail(CommonErrorEnum.PARAM_VALID.getErrorCode(), message.substring(0, message.length() - 1));
     }
 
     /**
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
         String message = errorMsg.toString();
         log.info("validation parameters error！The reason is:{}", message);
-        return ApiResult.fail(-1, message.substring(0, message.length() - 1));
+        return ApiResult.fail(CommonErrorEnum.PARAM_VALID.getErrorCode(), message.substring(0, message.length() - 1));
     }
 
     /**
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NullPointerException.class)
     public ApiResult exceptionHandler(NullPointerException e) {
-        log.error("null point exception！The reason is:{}", e.getMessage(), e);
+        log.error("null point exception！The reason is: ", e);
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
     }
 
@@ -73,4 +73,12 @@ public class GlobalExceptionHandler {
         return ApiResult.fail(-1, String.format("不支持'%s'请求", e.getMethod()));
     }
 
+    /**
+     * 限流异常
+     */
+    @ExceptionHandler(value = FrequencyControlException.class)
+    public ApiResult frequencyControlExceptionHandler(FrequencyControlException e) {
+        log.info("frequencyControl exception！The reason is：{}", e.getMessage(), e);
+        return ApiResult.fail(e.getErrorCode(), e.getMessage());
+    }
 }
